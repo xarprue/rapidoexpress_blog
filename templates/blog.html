@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Blog - Rápido Express</title>
+  <style>
+* { margin:0; padding:0; box-sizing:border-box; }
+body { font-family:'Segoe UI',sans-serif; background:#eef2f5; color:#333; }
+.navbar { background:#1a2e35; padding:0 40px; position:sticky; top:0; z-index:100; }
+.nav-inner { max-width:1000px; margin:0 auto; display:flex; align-items:center; justify-content:space-between; height:60px; }
+.nav-brand { color:white; font-size:20px; font-weight:bold; }
+.nav-brand span { color:#00b4a6; }
+.nav-links { display:flex; gap:8px; }
+.nav-link { color:#ccc; text-decoration:none; padding:8px 16px; border-radius:20px; font-size:14px; }
+.nav-link:hover, .nav-link.active { background:#00b4a6; color:white; }
+.hero { background:linear-gradient(135deg,#00b4a6,#007d75); color:white; text-align:center; padding:50px 20px; }
+.hero h1 { font-size:36px; margin-bottom:10px; }
+main { max-width:1000px; margin:40px auto; padding:0 20px; }
+.filtro-wrap { display:flex; align-items:center; gap:10px; margin-bottom:30px; flex-wrap:wrap; }
+.filtro-label { font-weight:bold; color:#555; font-size:14px; }
+.filtro-btn { background:white; border:2px solid #00b4a6; color:#00b4a6; padding:6px 18px; border-radius:20px; cursor:pointer; font-size:14px; font-weight:bold; }
+.filtro-btn:hover, .filtro-btn.active { background:#00b4a6; color:white; }
+.seccion-anio { background:white; border-radius:16px; padding:30px; margin-bottom:30px; box-shadow:0 2px 16px rgba(0,0,0,0.07); border-top:4px solid #00b4a6; }
+.etiqueta-anio { display:inline-block; background:#00b4a6; color:white; padding:6px 18px; border-radius:20px; font-weight:bold; font-size:15px; margin-bottom:20px; }
+.titulo-pub { font-size:26px; margin:16px 0 8px; color:#1a2e35; }
+.subtitulo-pub { font-size:19px; margin:14px 0 6px; border-left:4px solid #00b4a6; padding-left:12px; color:#444; }
+.parrafo-pub { font-size:15px; line-height:1.8; margin:10px 0; color:#555; }
+.imagen-pub { width:100%; border-radius:12px; margin:16px 0; }
+footer { text-align:center; padding:24px; color:#aaa; font-size:13px; margin-top:20px; }
+</style>
+</head>
+<body>
+  <nav class="navbar">
+    <div class="nav-inner">
+      <div class="nav-brand">🚚 <span>Rápido Express</span></div>
+      <div class="nav-links">
+        <a href="/" class="nav-link active">📰 Blog</a>
+        <a href="/dashboard" class="nav-link">⚙️ Dashboard</a>
+        <a href="/descargar-json" target="_blank" class="nav-link">⬇️ JSON</a>
+      </div>
+    </div>
+  </nav>
+
+  <div class="hero">
+    <h1>Blog Informativo</h1>
+    <p>Noticias, rutas y novedades de Rápido Express</p>
+  </div>
+
+  <main>
+    {% if sin_archivo %}
+      <div class="aviso">
+        <p>No hay contenido cargado aún.</p>
+        <a href="/dashboard" class="btn-primary">Ir al Dashboard</a>
+      </div>
+    {% else %}
+      <div class="filtro-wrap">
+        <span class="filtro-label">Filtrar por año:</span>
+        <button class="filtro-btn active" onclick="filtrar('todos', this)">Todos</button>
+        {% for anio in datos.keys() | sort(reverse=true) %}
+          <button class="filtro-btn" onclick="filtrar('{{ anio }}', this)">{{ anio }}</button>
+        {% endfor %}
+      </div>
+      {% for anio in datos.keys() | sort(reverse=true) %}
+        <section class="seccion-anio" data-anio="{{ anio }}">
+          <div class="etiqueta-anio">📅 {{ anio }}</div>
+          {% for item in datos[anio] %}
+            {% if item.tipo == "T" %}
+              <h1 class="titulo-pub" style="{{ item.estilo }}">{{ item.contenido }}</h1>
+            {% elif item.tipo == "ST" %}
+              <h2 class="subtitulo-pub" style="{{ item.estilo }}">{{ item.contenido }}</h2>
+            {% elif item.tipo == "P" %}
+              <p class="parrafo-pub" style="{{ item.estilo }}">{{ item.contenido }}</p>
+            {% elif item.tipo == "I" %}
+              <img class="imagen-pub" src="{{ item.contenido }}" style="{{ item.estilo }}" alt="imagen">
+            {% endif %}
+          {% endfor %}
+        </section>
+      {% endfor %}
+    {% endif %}
+  </main>
+
+  <footer>
+    <p>© 2025 Rápido Express — Blog generado dinámicamente desde Excel</p>
+  </footer>
+
+  <script>
+    function filtrar(anio, btn) {
+      document.querySelectorAll('.filtro-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      document.querySelectorAll('.seccion-anio').forEach(sec => {
+        sec.style.display = (anio === 'todos' || sec.dataset.anio === anio) ? 'block' : 'none';
+      });
+    }
+  </script>
+</body>
+</html>
